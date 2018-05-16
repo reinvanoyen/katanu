@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-module.exports = class Player {
+export default class Player {
 
   constructor(id, name) {
 

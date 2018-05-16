@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-const msg = require('./socket-messages');
-const EventManager = require('./event-manager');
+import msg from './socket-messages';
+import EventManager from './event-manager';
 
-module.exports = class Client {
+export default class Client {
 
   constructor(connection) {
     this.id = null;
@@ -28,6 +28,7 @@ module.exports = class Client {
   }
 
   send(data) {
+
     if (this.isConnected && this.id) {
       if ('clientId' in data) {
         data.toClientId = this.id;

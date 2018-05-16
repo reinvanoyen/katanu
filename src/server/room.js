@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const Player = require('./player');
+import Player from './player';
 
-module.exports = class Room {
+export default class Room {
 
   constructor(id) {
 

@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-module.exports = {
+export default {
   CL_SAY: 1,
   CL_JOIN_ROOM: 3,
   CL_CREATE_ROOM: 6,

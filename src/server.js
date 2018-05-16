@@ -1,5 +1,5 @@
-'use strict';
+"use strict";
 
-const Server = require('./server/server');
+import Server from './server/server';
 
-let server = Server.create();
+Server.create();

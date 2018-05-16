@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const WebSocket = require('ws');
-const msg = require('../shared/socket-messages');
-const Room = require('./room');
-const Client = require('./../shared/client');
+import WebSocket from 'ws';
+import msg from '../shared/socket-messages';
+import Room from './room';
+import Client from './../shared/client';
 
-module.exports = class Server {
+export default class Server {
 
   static create(port = 8080) {
 
@@ -23,7 +23,6 @@ module.exports = class Server {
 
   static init() {
     for (let i = 0; i < 10; i++) {
-      Server.createRoom();
       Server.createRoom();
     }
   }
@@ -70,6 +69,10 @@ module.exports = class Server {
       ws.on('message', (message) => {
         this.received(message);
       });
+
+      ws.on('error', (e) => {
+        this.disconnectClient(client);
+      });
     });
   }
 
@@ -84,10 +87,13 @@ module.exports = class Server {
   }
 
   static disconnectClient(client) {
+
     if (this.clients[client.getId()]) {
+
       this.clients[client.getId()].disconnect();
       delete this.clients[client.getId()];
       this.clientCount--;
+
       this.broadcast({
         action: msg.SV_SAY,
         message: 'Client (' + client.getId() + ') has disconnected'
@@ -96,13 +102,17 @@ module.exports = class Server {
   }
 
   static connectClient(client) {
+
     this.clients[client.getId()] = client;
     client.connect();
+
     this.send(client.getId(), {
       action: msg.SV_HANDSHAKE,
       id: client.getId()
     });
+
     this.clientCount++;
+
     this.broadcast({
       action: msg.SV_SAY,
       message: 'Client (' + client.getId() + ') has connected'
