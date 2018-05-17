@@ -24,6 +24,14 @@ export default class Renderer extends ECS.System {
 
   update(entity) {
 
+    if (entity.components.color) {
+      this.ctx.fillStyle = 'rgba('+entity.components.color.r+', '+entity.components.color.g+', '+entity.components.color.b+', '+entity.components.color.a+')';
+    }
+
+    if (entity.components.visualName) {
+      this.ctx.fillText( entity.components.visualName.text, entity.components.position.x + entity.components.disc.radius, entity.components.position.y);
+    }
+
     this.ctx.beginPath();
     this.ctx.arc( entity.components.position.x, entity.components.position.y, entity.components.disc.radius, 0, 2 * Math.PI );
     this.ctx.fill();

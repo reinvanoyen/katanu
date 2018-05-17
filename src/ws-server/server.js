@@ -3,7 +3,7 @@
 import WebSocket from 'ws';
 import msg from '../shared/socket-messages';
 import Room from './room';
-import Client from './../shared/client';
+import Client from '../shared/client';
 
 export default class Server {
 
@@ -95,6 +95,11 @@ export default class Server {
       this.clientCount--;
 
       this.broadcast({
+        action: msg.SV_CLIENT_DISCONNECTED,
+        id: client.getId()
+      });
+
+      this.broadcast({
         action: msg.SV_SAY,
         message: 'Client (' + client.getId() + ') has disconnected'
       });
@@ -112,6 +117,11 @@ export default class Server {
     });
 
     this.clientCount++;
+
+    this.broadcast({
+      action: msg.SV_CLIENT_CONNECTED,
+      id: client.getId()
+    });
 
     this.broadcast({
       action: msg.SV_SAY,

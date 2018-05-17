@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-class EventManager {
+export default class EventManager {
 
   static on(id, call) {
 
@@ -27,5 +27,3 @@ class EventManager {
     this.listeners[id].forEach(c => c(event));
   }
 }
-
-module.exports = EventManager;
