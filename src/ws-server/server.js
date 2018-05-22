@@ -96,7 +96,7 @@ export default class Server {
 
       this.broadcast({
         action: msg.SV_CLIENT_DISCONNECTED,
-        id: client.getId()
+        clientId: client.getId()
       });
 
       this.broadcast({
@@ -111,16 +111,17 @@ export default class Server {
     this.clients[client.getId()] = client;
     client.connect();
 
+    // Send a handshake
     this.send(client.getId(), {
       action: msg.SV_HANDSHAKE,
-      id: client.getId()
+      clientId: client.getId()
     });
 
     this.clientCount++;
 
     this.broadcast({
       action: msg.SV_CLIENT_CONNECTED,
-      id: client.getId()
+      clientId: client.getId()
     });
 
     this.broadcast({
@@ -133,47 +134,14 @@ export default class Server {
 
     let data = JSON.parse(message);
 
-    if (data.action === msg.CL_SAY) {
+    if (data.action === msg.CL_SAY || data.action === msg.COMPONENT_UPDATE) {
       this.broadcast(data);
-      return;
-    }
-
-    if (data.action === msg.CL_JOIN_ROOM) {
-
-      let room = null;
-      if ('roomIndex' in data) {
-        room = Server.getRoom(data.roomIndex);
-      } else {
-        room = Server.getAvailableRoom();
-      }
-
-      room.createPlayer(data.playerName);
-
-      Server.send(data.clientId, {
-        action: msg.SV_CLIENT_JOINED_ROOM
-      });
-
-      return;
     }
   }
 
   static tick() {
 
     console.log('tick');
-
-    if (this.rooms.length) {
-
-      this.broadcast({
-        action: msg.SV_ROOM_LISTING,
-        count: this.getRoomCount(),
-        clientCount: this.clientCount,
-        rooms: this.rooms.map((r, i) => {
-          let data = r.getPackageData();
-          data.index = i;
-          return data;
-        })
-      });
-    }
 
     setTimeout(() => {
       this.tick();

@@ -10,6 +10,7 @@ export default class Renderer extends ECS.System {
     this.height = height;
 
     this.canvas = document.createElement('canvas');
+    this.canvas.style.backgroundColor = '#002744';
     this.canvas.setAttribute('width', this.width);
     this.canvas.setAttribute('height', this.height);
 
@@ -28,16 +29,17 @@ export default class Renderer extends ECS.System {
       this.ctx.fillStyle = 'rgba('+entity.components.color.r+', '+entity.components.color.g+', '+entity.components.color.b+', '+entity.components.color.a+')';
     }
 
-    if (entity.components.visualName) {
-      this.ctx.fillText( entity.components.visualName.text, entity.components.position.x + entity.components.disc.radius, entity.components.position.y);
-    }
-
     this.ctx.beginPath();
-    this.ctx.arc( entity.components.position.x, entity.components.position.y, entity.components.disc.radius, 0, 2 * Math.PI );
+    this.ctx.arc(entity.components.position.x, entity.components.position.y, entity.components.disc.radius, 0, 2 * Math.PI);
     this.ctx.fill();
+
+    if (entity.components.visualName) {
+      this.ctx.fillStyle = 'rgba(255, 255, 255)';
+      this.ctx.fillText(entity.components.visualName.text, entity.components.position.x + entity.components.disc.radius + 15, entity.components.position.y);
+    }
   }
 
   preUpdate() {
-    this.ctx.clearRect( 0, 0, this.width, this.height );
+    this.ctx.clearRect(0, 0, this.width, this.height);
   }
 }

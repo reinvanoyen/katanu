@@ -30,11 +30,6 @@ export default class Client {
   send(data) {
 
     if (this.isConnected && this.id) {
-      if ('clientId' in data) {
-        data.toClientId = this.id;
-      } else {
-        data.clientId = this.id;
-      }
       this.connection.send(JSON.stringify(data));
     } else {
       console.error('No can do');
@@ -47,7 +42,7 @@ export default class Client {
 
     if (data.action === msg.SV_HANDSHAKE) {
       this.connect();
-      this.setId(data.id);
+      this.setId(data.clientId);
       return;
     }
 
