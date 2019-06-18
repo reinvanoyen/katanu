@@ -28,9 +28,6 @@ export default class Room {
     let player = new Player(this.currentPlayerId, name);
     this.players.push(player);
     this.playerIds[player.id] = player;
-    console.log('Player added to room: ' + player.name + ' (id: ' + player.id + ')');
-
-    // @TODO spawn entity (+ install tnt-ecs)
 
     return player;
   }

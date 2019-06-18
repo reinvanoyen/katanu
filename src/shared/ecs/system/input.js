@@ -1,5 +1,5 @@
 import ECS from 'tnt-ecs';
-import EventManager from '../../../shared/event-manager';
+import EventManager from '../../event-manager';
 
 export default class Input extends ECS.System {
 

@@ -9,19 +9,20 @@ import GlobalSay from './ui/global-say';
 
 import ECS from 'tnt-ecs';
 
-import Renderer from './ecs/system/renderer';
-import Movement from './ecs/system/movement';
-import Targetting from './ecs/system/targetting';
-import Input from './ecs/system/input';
-import Position from './ecs/component/position';
-import Velocity from './ecs/component/velocity';
-import Target from './ecs/component/target';
-import Control from './ecs/component/control';
-import Disc from './ecs/component/disc';
-import Color from './ecs/component/color';
-import VisualName from './ecs/component/visual-name';
+import Renderer from '../shared/ecs/system/renderer';
+import Movement from '../shared/ecs/system/movement';
+import Targetting from '../shared/ecs/system/targetting';
+import Input from '../shared/ecs/system/input';
+import Position from '../shared/ecs/component/position';
+import Velocity from '../shared/ecs/component/velocity';
+import Target from '../shared/ecs/component/target';
+import Control from '../shared/ecs/component/control';
+import Disc from '../shared/ecs/component/disc';
+import Color from '../shared/ecs/component/color';
+import VisualName from '../shared/ecs/component/visual-name';
 
-import EntityManager from './entity-manager';
+import EntityManager from '../shared/entity-manager';
+import createPlayer from "../shared/assemblage/player";
 
 // Websocket
 let ws = new WebSocket(`ws://${websocket.host}:${websocket.port}`);
@@ -82,14 +83,7 @@ function connected() {
   // Client connected
   EventManager.on(msg.SV_CLIENT_CONNECTED, e => {
 
-    let newEntity = new ECS.Entity([
-      new Color(),
-      new Position(),
-      new Disc(),
-      new Velocity(),
-      new Target(),
-      new VisualName({text: 'Client ' + e.clientId})
-    ]);
+    let newEntity = createPlayer(e.clientId);
 
     // It us us!
     if (client.getId() === e.clientId) {
@@ -132,5 +126,28 @@ function connected() {
         Object.assign(entity.components[e.component], entity.components[e.component], e.data);
       }
     }
+  });
+
+  // Client receives world state
+  EventManager.on(msg.SV_WORLD_STATE, e => {
+
+    for (let id in e.entities) {
+
+      let newEntity = createPlayer(id);
+
+      /*
+      e.entities[id].forEach(() => {
+
+        console.log('le sync');
+      });
+      */
+
+      ecs.addEntity(newEntity);
+
+      EntityManager.add(id, newEntity);
+    }
+
+    console.log('ok...');
+    console.log(e.entities);
   });
 }

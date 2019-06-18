@@ -2,19 +2,19 @@
 
 import WebSocket from 'ws';
 import msg from '../shared/socket-messages';
-import Room from './room';
 import Client from '../shared/client';
+import EntityManager from "../shared/entity-manager";
+import createPlayer from "../shared/assemblage/player";
 
 export default class Server {
 
   static create(port = 8080) {
 
     this.currentClientId = 0;
-    this.currentRoomId = 0;
-    this.rooms = [];
     this.clients = {};
     this.clientCount = 0;
     this.wss = new WebSocket.Server({ port: port });
+
     Server.registerEvents();
     Server.tick();
     Server.init();
@@ -22,35 +22,6 @@ export default class Server {
   }
 
   static init() {
-    for (let i = 0; i < 10; i++) {
-      Server.createRoom();
-    }
-  }
-
-  static createRoom() {
-    this.currentRoomId++;
-    let room = new Room(this.currentRoomId);
-    this.rooms.push(room);
-    return room;
-  }
-
-  static getRooms() {
-    return this.rooms;
-  }
-
-  static getRoomCount() {
-    return this.rooms.length;
-  }
-
-  static getRoom(index) {
-    return this.rooms[index];
-  }
-
-  static getAvailableRoom() {
-    if (!this.rooms.length || this.rooms[this.rooms.length-1].isFull()) {
-      return this.createRoom();
-    }
-    return this.rooms[this.rooms.length-1];
   }
 
   static registerEvents() {
@@ -128,6 +99,15 @@ export default class Server {
       action: msg.SV_SAY,
       message: 'Client (' + client.getId() + ') has connected'
     });
+
+    // Send the world state to the just connected client
+    this.send(client.getId(), {
+      action: msg.SV_WORLD_STATE,
+      entities: EntityManager.entities
+    });
+
+    // Add client entity to entity manager
+    EntityManager.add(client.getId(), createPlayer(client.getId()));
   }
 
   static received(message) {
@@ -140,8 +120,6 @@ export default class Server {
   }
 
   static tick() {
-
-    console.log('tick');
 
     setTimeout(() => {
       this.tick();
