@@ -9,6 +9,8 @@ export default class Disc extends ECS.Component {
   }
 
   getDefaults() {
-    return {radius: 20};
+    return {
+      radius: 5
+    };
   }
 }

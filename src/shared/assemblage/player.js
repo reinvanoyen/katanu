@@ -16,7 +16,7 @@ const createPlayer = (clientId) => {
     new Disc(),
     new Velocity(),
     new Target(),
-    new VisualName({text: 'Client ' + clientId})
+    new VisualName()
   ]);
 };
 

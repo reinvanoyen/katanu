@@ -9,6 +9,6 @@ export default class Target extends ECS.Component {
   }
 
   getDefaults() {
-    return {x: 0, y: 0};
+    return {x: 100, y: 100};
   }
 }

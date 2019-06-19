@@ -10,7 +10,7 @@ export default class Renderer extends ECS.System {
     this.height = height;
 
     this.canvas = document.createElement('canvas');
-    this.canvas.style.backgroundColor = '#002744';
+    this.canvas.style.backgroundColor = '#001021';
     this.canvas.setAttribute('width', this.width);
     this.canvas.setAttribute('height', this.height);
 

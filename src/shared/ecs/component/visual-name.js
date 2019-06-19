@@ -9,6 +9,6 @@ export default class VisualName extends ECS.Component {
   }
 
   getDefaults() {
-    return {text: ''};
+    return {text: 'Unnamed'};
   }
 }

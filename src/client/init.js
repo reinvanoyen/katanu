@@ -66,6 +66,20 @@ function connected() {
     client.received(message);
   };
 
+  EventManager.on('start', e => {
+    client.send({
+      action: msg.START,
+      clientId: client.getId()
+    });
+  });
+
+  EventManager.on('stop', e => {
+    client.send({
+      action: msg.STOP,
+      clientId: client.getId()
+    });
+  });
+
   EventManager.on('sendMessage', e => {
     client.send({
       action: msg.CL_SAY,
@@ -133,21 +147,21 @@ function connected() {
 
     for (let id in e.entities) {
 
-      let newEntity = createPlayer(id);
+      if (id !== client.getId()) {
 
-      /*
-      e.entities[id].forEach(() => {
+        let newEntity = createPlayer(id);
 
-        console.log('le sync');
-      });
-      */
+        for (let componentName in e.entities[id].components) {
+          if (newEntity.components[componentName]) {
+            let componentData = e.entities[id].components[componentName];
+            Object.assign(newEntity.components[componentName], newEntity.components[componentName], componentData);
+          }
+        }
 
-      ecs.addEntity(newEntity);
+        ecs.addEntity(newEntity);
 
-      EntityManager.add(id, newEntity);
+        EntityManager.add(id, newEntity);
+      }
     }
-
-    console.log('ok...');
-    console.log(e.entities);
   });
 }

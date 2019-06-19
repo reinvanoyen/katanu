@@ -2,10 +2,23 @@
 
 import msg from '../../shared/socket-messages';
 import EventManager from '../../shared/event-manager';
+import math from '../../shared/util/math';
 
 export default class GlobalSay {
 
   build() {
+
+    this.gameState = document.createElement('div');
+    this.gameState.style.position = 'fixed';
+    this.gameState.style.top = 0;
+    this.gameState.style.left = 0;
+    this.gameState.style.width = '100%';
+    this.gameState.style.color = '#ffffff';
+    this.gameState.style.fontFamily = 'monospace';
+    this.gameState.style.fontSize = '35px';
+    this.gameState.style.textAlign = 'center';
+    this.gameState.textContent = 'Not started';
+    document.body.appendChild(this.gameState);
 
     this.globalSayEl = document.createElement('div');
     this.globalSayEl.style.position = 'fixed';
@@ -18,50 +31,68 @@ export default class GlobalSay {
     this.globalSayEl.style.backgroundColor = '#ffffff';
     this.globalSayEl.style.fontFamily = 'monospace';
 
+    // Start / stop button
+
+    this.startButton = document.createElement('button');
+    this.startButton.textContent = 'start';
+
+    this.stopButton = document.createElement('button');
+    this.stopButton.textContent = 'stop';
+
+    this.startButton.addEventListener('click', e => {
+      EventManager.trigger('start');
+    });
+
+    this.stopButton.addEventListener('click', e => {
+      EventManager.trigger('stop');
+    });
+
+    this.globalSayEl.appendChild(this.startButton);
+    this.globalSayEl.appendChild(this.stopButton);
+
+    // Name input
     this.input = document.createElement('input');
+    this.input.value = 'Unnamed';
     this.globalSayEl.appendChild(this.input);
 
-    this.input.addEventListener('keypress', e => {
-      if (e.keyCode === 13) {
-        EventManager.trigger('sendMessage', {
-          message: e.currentTarget.value
+    this.input.addEventListener('keyup', e => {
+      EventManager.trigger('sendMessage', {
+        message: e.currentTarget.value
+      });
+    });
+
+    // Abilities
+    document.addEventListener('keyup', e => {
+
+      if (e.keyCode === 49) {
+
+        EventManager.trigger('componentUpdate', {
+          component: 'color',
+          data: {
+            r: math.randBetween(0, 255),
+            g: math.randBetween(0, 255),
+            b: math.randBetween(0, 255)
+          }
         });
-        this.input.value = '';
+      }
+
+      if (e.keyCode === 50) {
+
+        EventManager.trigger('componentUpdate', {
+          component: 'disc',
+          data: {
+            radius: math.randBetween(5, 25)
+          }
+        });
       }
     });
 
-    this.propertiesEl = document.createElement('div');
-    this.globalSayEl.appendChild(this.propertiesEl);
-
-    this.colorInput = document.createElement('input');
-    this.colorInput.setAttribute('type', 'color');
-    this.propertiesEl.appendChild(this.colorInput);
-
-    this.colorInput.addEventListener('change', e => {
-
-      let value = this.colorInput.value.match(/[A-Za-z0-9]{2}/g);
-      value = value.map(v => parseInt(v, 16));
-
-      EventManager.trigger('componentUpdate', {
-        'component': 'color',
-        'data': {r: value[0], g: value[1], b: value[2]}
-      });
-    });
-
-    this.sizeInput = document.createElement('input');
-    this.sizeInput.setAttribute('type', 'range');
-    this.propertiesEl.appendChild(this.sizeInput);
-
-    this.sizeInput.addEventListener('change', e => {
-
-      EventManager.trigger('componentUpdate', {
-        'component': 'disc',
-        'data': {radius: parseInt(this.sizeInput.value)}
-      });
+    EventManager.on(msg.TICK, e => {
+      this.gameState.textContent = e.data.gameState;
     });
 
     EventManager.on(msg.CL_SAY, e => {
-      this.addMessage(e.clientId, e.message);
+      //this.addMessage(e.clientId, e.message);
     });
 
     EventManager.on(msg.SV_SAY, e => {

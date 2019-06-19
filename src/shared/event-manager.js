@@ -26,4 +26,11 @@ export default class EventManager {
 
     this.listeners[id].forEach(c => c(event));
   }
+
+  static remove(id) {
+
+    if (this.listeners && this.listeners[id]) {
+      delete this.listeners[id];
+    }
+  }
 }

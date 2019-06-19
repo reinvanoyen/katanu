@@ -15,7 +15,10 @@ export default class Input extends ECS.System {
 
         EventManager.trigger('componentUpdate', {
           component: 'target',
-          data: {x: e.clientX, y: e.clientY}
+          data: {
+            x: e.clientX,
+            y: e.clientY
+          }
         });
 
         entity.components.target.x = e.clientX;

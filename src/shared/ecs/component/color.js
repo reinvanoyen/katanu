@@ -9,6 +9,11 @@ export default class Color extends ECS.Component {
   }
 
   getDefaults() {
-    return {r: 0, g: 0, b: 0, a: 1};
+    return {
+      r: 255,
+      g: 0,
+      b: 0,
+      a: 1
+    };
   }
 }

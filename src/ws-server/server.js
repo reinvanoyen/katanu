@@ -5,6 +5,7 @@ import msg from '../shared/socket-messages';
 import Client from '../shared/client';
 import EntityManager from "../shared/entity-manager";
 import createPlayer from "../shared/assemblage/player";
+import EventManager from "../shared/event-manager";
 
 export default class Server {
 
@@ -16,17 +17,13 @@ export default class Server {
     this.wss = new WebSocket.Server({ port: port });
 
     Server.registerEvents();
-    Server.tick();
-    Server.init();
-    return Server;
-  }
 
-  static init() {
+    return Server;
   }
 
   static registerEvents() {
 
-    this.wss.on('connection', (ws) => {
+    this.wss.on('connection', ws => {
 
       this.currentClientId++;
       let client = new Client(ws);
@@ -74,6 +71,8 @@ export default class Server {
         action: msg.SV_SAY,
         message: 'Client (' + client.getId() + ') has disconnected'
       });
+
+      EntityManager.remove(client.getId());
     }
   }
 
@@ -114,15 +113,24 @@ export default class Server {
 
     let data = JSON.parse(message);
 
+    EventManager.trigger(msg.SERVER_RECEIVED_MESSAGE, {
+      data: data
+    });
+
     if (data.action === msg.CL_SAY || data.action === msg.COMPONENT_UPDATE) {
+
+      // Broadcast the message
       this.broadcast(data);
+
+      // If it's a component update, also update the component
+      if (data.action === msg.COMPONENT_UPDATE) {
+
+        let entity = EntityManager.get(data.clientId);
+
+        if (entity) {
+          Object.assign(entity.components[data.component], entity.components[data.component], data.data);
+        }
+      }
     }
-  }
-
-  static tick() {
-
-    setTimeout(() => {
-      this.tick();
-    }, 1000);
   }
 }
